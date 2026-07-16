@@ -36,7 +36,7 @@ form.addEventListener("submit", async (event) => {
         }
 
         // Get the JWT returned by the server
-        const token = await response.text();
+        const token = await response.json();
 
         // Save the JWT
         localStorage.setItem("token", token);
