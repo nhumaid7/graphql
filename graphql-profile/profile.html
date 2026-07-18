@@ -6,14 +6,71 @@
     <title>Document</title>
 </head>
 <body>
-    <h2 id="welcome-message">Welcome, Loading...</h2>
-    <p id="xp-message">Your XP: Loading...</p>
-    <p id="grade-message">Your Grade: Loading...</p>
-    <p id="audit-message">Your Audit Ratio: Loading...</p>
-    <button id="logout-button">Logout</button>
+   <header>
+    <h1>GraphQL Profile</h1>
+    </header>
+
+<main>
+
+    <section class="profile-card">
+
+        <h2 id="welcome-message">Welcome...</h2>
+
+        <p><strong>Login:</strong> <span id="login">Loading...</span></p>
+
+        <p><strong>First Name:</strong> <span id="first-name">Loading...</span></p>
+
+        <p><strong>Last Name:</strong> <span id="last-name">Loading...</span></p>
+
+        <p><strong>Campus:</strong> <span id="campus">Loading...</span></p>
+
+        <p><strong>Audit Ratio:</strong> <span id="audit-ratio">Loading...</span></p>
+
+        <p><strong>Total Up:</strong> <span id="total-up">Loading...</span></p>
+
+        <p><strong>Total Down:</strong> <span id="total-down">Loading...</span></p>
+
+    </section>
+
+    <section>
+        <h2>XP Progress</h2>
+
+        <svg id="xp-graph" width="700" height="300"></svg>
+    </section>
+
+    <section>
+        <h2>Audit Graph</h2>
+
+        <svg id="audit-graph" width="700" height="300"></svg>
+    </section>
+
+    <section>
+        <h2>Projects</h2>
+
+        <table id="projects-table">
+
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>XP</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            </tbody>
+
+        </table>
+    </section>
+
+    <button id="logout-btn">Logout</button>
+
+</main>
 </body>
 
 <script src="js/graphql.js"></script>
+<script src="js/graphs.js"></script>
 <script src="js/profile.js"></script>
 
 </html>
