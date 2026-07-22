@@ -2,7 +2,6 @@ async function loadProfile() {
     const query = `
     query {
     user {
-
         login
         firstName
         lastName
@@ -12,54 +11,84 @@ async function loadProfile() {
         campus
 
         events {
+        level
 
-            level
-
-            xp {
-                amount
-                path
-                originEventId
-            }
-
+        xp {
+            amount
+            path
+            originEventId
+        }
         }
 
+        transactions(
+        where: { type: { _eq: "xp" } }
+        order_by: { createdAt: desc }
+        limit: 5
+        ) {
+        amount
+        path
+        createdAt
+        }
+
+        audits(
+        where: { grade: { _is_null: true } }
+        order_by: { createdAt: desc }
+        limit: 5
+        ) {
+        createdAt
+
+        group {
+            path
+        }
+
+        private {
+            code
+        }
         }
     }
-    `;
+    }`;
+
 
     const data = await graphqlRequest(query);
-    // console.log(data.user);
-
-    const user = data.user[0];
-    const xpEvents = user.events.filter(event => event.xp !== null);
-    // console.log(xpEvents);
-    // const projectName = xpEvents[0].xp.path.split("/").pop();
 
     if (!data || data.user.length === 0) {
         console.error("No user found.");
         return;
     }
 
+    const user = data.user[0];
+    const xpEvents = user.events.filter(event => event.xp !== null);
+    // console.log(xpEvents);
+    // const projectName = xpEvents[0].xp.path.split("/").pop();
+
     document.getElementById("welcome-message").innerText =
         `Welcome, ${user.firstName}`;
     
 
     // Profile information
-    document.getElementById("login").textContent = user.login;
-    document.getElementById("first-name").textContent = user.firstName;
-    document.getElementById("last-name").textContent = user.lastName;
     document.getElementById("campus").textContent = user.campus;
-    document.getElementById("audit-ratio").textContent =
-        user.auditRatio.toFixed(2);
-    document.getElementById("total-up").textContent =
-        user.totalUp.toLocaleString();
-    document.getElementById("total-down").textContent =
-        user.totalDown.toLocaleString();
+ 
 
 
         // document.getElementById("xp-graph").innerHTML = generateXpGraph(xpEvents);
 
         drawXPGraph(xpEvents);
-    }
+
+        const recentTransactions = user.transactions;
+        drawRecentXPGraph(recentTransactions);
+
+        drawAuditGraph(user);
+        drawAuditorActivity(user.audits);
     
-    loadProfile()
+    }
+
+    const logout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "index.html";
+    };
+
+    loadProfile();
+
+    document
+        .getElementById("logout-btn")
+        .addEventListener("click", logout);
