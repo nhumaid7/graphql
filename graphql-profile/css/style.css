@@ -129,25 +129,6 @@ main { display: flex; flex-direction: column; gap: 42px; padding-top: 12px; }
   100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
 }
 
-.sprig {
-  position: absolute;
-  top: 10%;
-  width: clamp(30px, 4vw, 52px);
-  opacity: .8;
-  animation: floatDrift 7s ease-in-out infinite;
-}
-.sprig--left  { left: 10%; transform: rotate(-14deg) scaleX(-1); animation-delay: .8s; }
-.sprig--right { right: 10%; transform: rotate(14deg); animation-delay: 2.4s; }
-
-@keyframes floatDrift {
-  0%, 100% { translate: 0 0; rotate: -3deg; scale: 1; }
-  50%      { translate: 0 -16px; rotate: 3deg; scale: 1.05; }
-}
-
-@media (max-width: 640px) {
-  .sprig { display: none; }
-}
-
 /* =====================================================
    Headings, dividers & flourishes
    ===================================================== */
@@ -420,6 +401,25 @@ svg text {
 #audit-graph rect[fill="#cccccc"] { fill: var(--powder-blue) !important; }
 #audit-graph text[fill="#00d4aa"] { fill: #6f8a66 !important; font-weight: 600; }
 
+/* auditor-activity: copy-code button */
+.copy-btn { cursor: pointer; }
+.copy-btn .copy-hit { cursor: pointer; }
+.copy-btn .icon-copy rect {
+  fill: var(--pearl);
+  stroke: var(--gold);
+  stroke-width: 1.4;
+  transition: stroke .2s ease, fill .2s ease;
+}
+.copy-btn:hover .icon-copy rect { stroke: var(--dusty-pink); fill: #fff; }
+.copy-btn .icon-copy { transition: opacity .2s ease; }
+.copy-btn .icon-check {
+  stroke: var(--sage);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.copy-btn.copied .icon-copy { opacity: 0; }
+.copy-btn.copied .icon-check { opacity: 1; }
+
 /* =====================================================
    Buttons
    ===================================================== */
@@ -533,6 +533,39 @@ main > .btn { display: block; }
   border-bottom-color: var(--dusty-pink);
   box-shadow: 0 6px 10px -8px rgba(231, 184, 194, .8);
 }
+
+.password-field { position: relative; display: flex; align-items: center; }
+.password-field input { width: 100%; padding-right: 36px; }
+
+.eye-toggle {
+  position: absolute;
+  right: 2px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: none;
+  transition: color .2s ease, background .2s ease;
+}
+.eye-toggle:hover,
+.eye-toggle:active {
+  background: rgba(231, 184, 194, .18);
+  color: var(--dusty-pink);
+  transform: none;
+  box-shadow: none;
+}
+.eye-toggle .icon-eye-off { display: none; }
+.eye-toggle.is-visible .icon-eye { display: none; }
+.eye-toggle.is-visible .icon-eye-off { display: block; }
 
 .auth-form .btn { margin-top: 26px; }
 

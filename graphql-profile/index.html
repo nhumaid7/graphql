@@ -23,20 +23,6 @@
                 </g>
                 <circle cx="20" cy="20" r="5" fill="var(--gold)"/>
             </symbol>
-            <symbol id="flower-branch" viewBox="0 0 260 460">
-                <path d="M40,460 C55,370 45,280 80,190 C100,130 140,90 175,40" fill="none" stroke="var(--sage)" stroke-width="3" stroke-linecap="round"/>
-                <path d="M80,190 C60,175 40,168 15,160" fill="none" stroke="var(--sage)" stroke-width="2.2" stroke-linecap="round"/>
-                <path d="M120,130 C140,110 160,100 190,92" fill="none" stroke="var(--sage)" stroke-width="2.2" stroke-linecap="round"/>
-                <path d="M60,340 C40,332 28,312 35,292 C57,298 70,318 60,340 Z" fill="var(--sage)" opacity="0.8"/>
-                <path d="M95,250 C117,244 132,226 125,204 C103,210 88,230 95,250 Z" fill="var(--sage)" opacity="0.75"/>
-                <path d="M45,155 C25,148 14,130 20,110 C42,116 54,136 45,155 Z" fill="var(--sage)" opacity="0.7"/>
-                <use href="#bloom-unit" transform="translate(10,388) scale(1.3)" fill="var(--dusty-pink)"/>
-                <use href="#bloom-unit" transform="translate(-4,142) rotate(-10) scale(0.9)" fill="var(--baby-blue)"/>
-                <use href="#bloom-unit" transform="translate(178,74) rotate(12) scale(0.85)" fill="var(--lavender)"/>
-                <use href="#bloom-unit" transform="translate(158,20) scale(1.05)" fill="var(--dusty-pink)"/>
-                <circle cx="112" cy="270" r="6" fill="var(--blush-rose)"/>
-                <circle cx="50" cy="230" r="4" fill="var(--gold)"/>
-            </symbol>
         </defs>
     </svg>
 
@@ -63,8 +49,6 @@
         <svg class="falling-flower" style="--x:72%; --size:19px; --duration:15s; --delay:-7s" viewBox="0 0 40 40"><use href="#bloom-unit" fill="var(--baby-blue)"/></svg>
         <svg class="falling-flower" style="--x:96%; --size:13px; --duration:11s; --delay:-5s" viewBox="0 0 40 40"><use href="#bloom-unit" fill="var(--lavender)"/></svg>
         <svg class="falling-flower" style="--x:60%; --size:27px; --duration:20s; --delay:-14s" viewBox="0 0 40 40"><use href="#bloom-unit" fill="var(--sage)"/></svg>
-        <svg class="sprig sprig--left"><use href="#flower-branch"></use></svg>
-        <svg class="sprig sprig--right"><use href="#flower-branch"></use></svg>
     </div>
 
     <div class="page auth-page">
@@ -77,7 +61,21 @@
                 <label for="username">Username or Email</label>
                 <input type="text" name="username" id="username" placeholder="Username or Email" required>
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="Password" required>
+                <div class="password-field">
+                    <input type="password" name="password" id="password" placeholder="Password" required>
+                    <button type="button" id="toggle-password" class="eye-toggle" aria-label="Show password">
+                        <svg class="icon-eye" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <svg class="icon-eye-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3l18 18"/>
+                            <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/>
+                            <path d="M9.9 5.2A10.6 10.6 0 0 1 12 5c7 0 11 7 11 7a13.2 13.2 0 0 1-3.4 4"/>
+                            <path d="M6.1 6.1C3.4 7.9 1 12 1 12a13.2 13.2 0 0 0 5.4 5.4"/>
+                        </svg>
+                    </button>
+                </div>
                 <button type="submit" class="btn">Sign In</button>
                 <p id="error-message"></p>
             </form>

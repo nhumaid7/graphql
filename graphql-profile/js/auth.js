@@ -3,6 +3,15 @@ const form = document.getElementById("login-form");
 const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 const errorMessage = document.getElementById("error-message");
+const togglePasswordBtn = document.getElementById("toggle-password");
+
+// Toggle the password field between hidden and visible
+togglePasswordBtn.addEventListener("click", () => {
+    const isVisible = passwordInput.type === "text";
+    passwordInput.type = isVisible ? "password" : "text";
+    togglePasswordBtn.classList.toggle("is-visible", !isVisible);
+    togglePasswordBtn.setAttribute("aria-label", isVisible ? "Show password" : "Hide password");
+});
 
 // Listen for the form submission
 form.addEventListener("submit", async (event) => {

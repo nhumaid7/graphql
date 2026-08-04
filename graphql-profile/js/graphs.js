@@ -1,39 +1,76 @@
 
 
-function drawXPGraph(xpEvents) {
+function drawXPGraph(transactions) {
 
-    // Calculate total XP (used for scaling)
     let totalXP = 0;
 
-    xpEvents.forEach(event => {
-        totalXP += event.xp.amount;
+    // Calculate total cumulative XP
+    transactions.forEach(transaction => {
+        totalXP += transaction.amount;
     });
 
     const maxXP = totalXP;
 
     const svg = document.getElementById("xp-graph");
 
-    let circles = "";   
+    let circles = "";
     let path = "";
-    const spacing = 600 / (xpEvents.length - 1);
+    let xLabels = "";
+    let yLabels = "";
 
-    // Reset total XP so we can build the running total
+    const spacing =
+        transactions.length > 1
+            ? 600 / (transactions.length - 1)
+            : 600;
+
+    // Build Y-axis labels
+    const numberOfTicks = 5;
+
+    for (let i = 0; i <= numberOfTicks; i++) {
+
+        const value = (maxXP * (numberOfTicks - i)) / numberOfTicks;
+        const y = 50 + i * 40;
+
+        yLabels += `
+            <text
+                x="40"
+                y="${y}"
+                font-size="12"
+                text-anchor="end"
+            >
+                ${formatKB(value)}
+            </text>
+        `;
+    }
+
+    // Running total
     totalXP = 0;
 
-    xpEvents.forEach((event, index) => {
+    transactions.forEach((transaction, index) => {
 
-        totalXP += event.xp.amount;
+        totalXP += transaction.amount;
 
-        const x = 50 + index * spacing;
+        const x = 70 + index * spacing;
         const y = 250 - (totalXP / maxXP) * 200;
+
+        const projectName =
+            transaction.object?.name ||
+            transaction.path.split("/").pop();
 
         circles += `
             <circle
                 cx="${x}"
                 cy="${y}"
                 r="5"
-                fill="red"
-            />
+                fill="#e8b8c6"
+                stroke="white"
+                stroke-width="2"
+            >
+                <title>
+${projectName}
+${formatKB(totalXP)}
+                </title>
+            </circle>
         `;
 
         if (index === 0) {
@@ -42,38 +79,76 @@ function drawXPGraph(xpEvents) {
             path += ` L ${x} ${y}`;
         }
 
+        if (index % 2 === 0) {
+            xLabels += `
+                <text
+                    x="${x}"
+                    y="275"
+                    font-size="10"
+                    text-anchor="middle"
+                >
+                    ${projectName}
+                </text>
+            `;
+        }
     });
-    svg.innerHTML = `
-        <!-- X-axis -->
-        <line
-            x1="50"
-            y1="250"
-            x2="650"
-            y2="250"
-            stroke="black"
-            stroke-width="2"
-        />
 
+    svg.innerHTML = `
         <!-- Y-axis -->
         <line
-            x1="50"
-            y1="20"
-            x2="50"
+            x1="70"
+            y1="30"
+            x2="70"
             y2="250"
-            stroke="black"
+            stroke="#9a9a9a"
             stroke-width="2"
         />
 
+        <!-- X-axis -->
+        <line
+            x1="70"
+            y1="250"
+            x2="670"
+            y2="250"
+            stroke="#9a9a9a"
+            stroke-width="2"
+        />
+
+        <!-- Y-axis title -->
+        <text
+            x="18"
+            y="145"
+            transform="rotate(-90 18 145)"
+            font-size="13"
+            font-weight="bold"
+        >
+            Total XP
+        </text>
+
+        <!-- X-axis title -->
+        <text
+            x="370"
+            y="300"
+            text-anchor="middle"
+            font-size="13"
+            font-weight="bold"
+        >
+            Projects
+        </text>
+
+        ${yLabels}
 
         <path
             d="${path}"
             fill="none"
-            stroke="blue"
-            stroke-width="2"
+            stroke="#caa257"
+            stroke-width="3"
         />
-        ${circles}
-    `;
 
+        ${circles}
+
+        ${xLabels}
+    `;
 }
 
 
@@ -192,7 +267,6 @@ svg.innerHTML = `
 `;
 }
 
-
 function drawAuditorActivity(audits) {
 
     const svg = document.getElementById("auditor-activity");
@@ -223,10 +297,30 @@ function drawAuditorActivity(audits) {
             >
                 Audit Code: ${auditCode}
             </text>
+
+            <g class="copy-btn" data-code="${auditCode}" transform="translate(430, ${y - 15})">
+                <rect class="copy-hit" x="-6" y="-6" width="30" height="30" fill="transparent"/>
+                <g class="icon-copy">
+                    <rect x="4" y="2" width="12" height="14" rx="2" ry="2"/>
+                    <rect x="0" y="6" width="12" height="14" rx="2" ry="2"/>
+                </g>
+                <path class="icon-check" d="M2,11 L7,16 L17,4" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
         `;
     });
 
     svg.innerHTML = items;
+
+    svg.querySelectorAll(".copy-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const code = btn.getAttribute("data-code");
+
+            navigator.clipboard.writeText(code).then(() => {
+                btn.classList.add("copied");
+                setTimeout(() => btn.classList.remove("copied"), 1200);
+            });
+        });
+    });
 }
 
 
