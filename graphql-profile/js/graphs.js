@@ -15,33 +15,11 @@ function drawXPGraph(transactions) {
 
     let circles = "";
     let path = "";
-    let xLabels = "";
-    let yLabels = "";
 
     const spacing =
         transactions.length > 1
             ? 600 / (transactions.length - 1)
             : 600;
-
-    // Build Y-axis labels
-    const numberOfTicks = 5;
-
-    for (let i = 0; i <= numberOfTicks; i++) {
-
-        const value = (maxXP * (numberOfTicks - i)) / numberOfTicks;
-        const y = 50 + i * 40;
-
-        yLabels += `
-            <text
-                x="40"
-                y="${y}"
-                font-size="12"
-                text-anchor="end"
-            >
-                ${formatKB(value)}
-            </text>
-        `;
-    }
 
     // Running total
     totalXP = 0;
@@ -51,7 +29,7 @@ function drawXPGraph(transactions) {
         totalXP += transaction.amount;
 
         const x = 70 + index * spacing;
-        const y = 250 - (totalXP / maxXP) * 200;
+        const y = 270 - (totalXP / maxXP) * 240;
 
         const projectName =
             transaction.object?.name ||
@@ -59,37 +37,22 @@ function drawXPGraph(transactions) {
 
         circles += `
             <circle
+                class="xp-dot"
                 cx="${x}"
                 cy="${y}"
                 r="5"
                 fill="#e8b8c6"
                 stroke="white"
                 stroke-width="2"
-            >
-                <title>
-${projectName}
-${formatKB(totalXP)}
-                </title>
-            </circle>
+                data-project="${projectName}"
+                data-xp="${formatKB(totalXP)}"
+            ></circle>
         `;
 
         if (index === 0) {
             path += `M ${x} ${y}`;
         } else {
             path += ` L ${x} ${y}`;
-        }
-
-        if (index % 2 === 0) {
-            xLabels += `
-                <text
-                    x="${x}"
-                    y="275"
-                    font-size="10"
-                    text-anchor="middle"
-                >
-                    ${projectName}
-                </text>
-            `;
         }
     });
 
@@ -99,7 +62,7 @@ ${formatKB(totalXP)}
             x1="70"
             y1="30"
             x2="70"
-            y2="250"
+            y2="270"
             stroke="#9a9a9a"
             stroke-width="2"
         />
@@ -107,36 +70,12 @@ ${formatKB(totalXP)}
         <!-- X-axis -->
         <line
             x1="70"
-            y1="250"
+            y1="270"
             x2="670"
-            y2="250"
+            y2="270"
             stroke="#9a9a9a"
             stroke-width="2"
         />
-
-        <!-- Y-axis title -->
-        <text
-            x="18"
-            y="145"
-            transform="rotate(-90 18 145)"
-            font-size="13"
-            font-weight="bold"
-        >
-            Total XP
-        </text>
-
-        <!-- X-axis title -->
-        <text
-            x="370"
-            y="300"
-            text-anchor="middle"
-            font-size="13"
-            font-weight="bold"
-        >
-            Projects
-        </text>
-
-        ${yLabels}
 
         <path
             d="${path}"
@@ -146,9 +85,25 @@ ${formatKB(totalXP)}
         />
 
         ${circles}
-
-        ${xLabels}
     `;
+
+    const tooltip = document.getElementById("chart-tooltip");
+
+    svg.querySelectorAll(".xp-dot").forEach((dot) => {
+
+        const showTooltip = (event) => {
+            tooltip.innerHTML = `<strong>${dot.dataset.project}</strong><span>${dot.dataset.xp}</span>`;
+            tooltip.style.left = `${event.clientX}px`;
+            tooltip.style.top = `${event.clientY}px`;
+            tooltip.classList.add("visible");
+        };
+
+        dot.addEventListener("mouseenter", showTooltip);
+        dot.addEventListener("mousemove", showTooltip);
+        dot.addEventListener("mouseleave", () => {
+            tooltip.classList.remove("visible");
+        });
+    });
 }
 
 
@@ -157,41 +112,51 @@ function drawRecentXPGraph(transactions) {
     const svg = document.getElementById("recent-xp-graph");
 
     const maxXP = Math.max(
-        ...transactions.map(transaction => transaction.amount)
+        ...transactions.map(transaction => Math.max(transaction.amount, 0))
     );
+
+    const rowHeight = 42;
+    const topMargin = 30;
+    const bottomMargin = 20;
+    const contentHeight = topMargin + transactions.length * rowHeight + bottomMargin;
+
+    // Grow the coordinate space to fit every row instead of
+    // letting rows past the old fixed height get clipped off.
+    svg.setAttribute("viewBox", `0 0 700 ${contentHeight}`);
+    svg.setAttribute("height", contentHeight);
 
     let bars = "";
 
     transactions.forEach((transaction, index) => {
 
         const projectName = transaction.path.split("/").pop();
-        const width = (transaction.amount / maxXP) * 350;
-        const y = 30 + index * 40;
+        const width = Math.max((transaction.amount / maxXP) * 320, 0);
+        const y = 30 + index * rowHeight;
 
         bars += `
             <!-- Project name -->
             <text
                 x="10"
-                y="${y + 15}"
-                font-size="14"
+                y="${y + 16}"
+                font-size="17"
             >
                 ${projectName}
             </text>
 
             <!-- XP bar -->
             <rect
-                x="180"
+                x="220"
                 y="${y}"
                 width="${width}"
-                height="20"
+                height="22"
                 fill="purple"
             />
 
             <!-- XP amount -->
             <text
-                x="${190 + width}"
-                y="${y + 15}"
-                font-size="14"
+                x="${230 + width}"
+                y="${y + 16}"
+                font-size="17"
             >
                 ${(transaction.amount / 1000).toFixed(1)} KB
             </text>
@@ -214,8 +179,8 @@ svg.innerHTML = `
     <!-- Done label -->
     <text
         x="20"
-        y="25"
-        font-size="16"
+        y="26"
+        font-size="19"
     >
         Done (${formatKB(user.totalUp)})
     </text>
@@ -223,17 +188,17 @@ svg.innerHTML = `
     <!-- Done bar -->
     <rect
         x="20"
-        y="35"
+        y="36"
         width="${doneWidth}"
-        height="12"
+        height="14"
         fill="#00d4aa"
     />
 
     <!-- Received label -->
     <text
         x="20"
-        y="80"
-        font-size="16"
+        y="83"
+        font-size="19"
     >
         Received (${formatKB(user.totalDown)})
     </text>
@@ -241,26 +206,26 @@ svg.innerHTML = `
     <!-- Received bar -->
     <rect
         x="20"
-        y="90"
+        y="93"
         width="${receivedWidth}"
-        height="12"
+        height="14"
         fill="#cccccc"
     />
 
     <!-- Audit Ratio -->
     <text
         x="20"
-        y="160"
-        font-size="40"
+        y="165"
+        font-size="46"
         fill="#00d4aa"
     >
         ${user.auditRatio.toFixed(2)}
     </text>
 
     <text
-        x="110"
-        y="160"
-        font-size="18"
+        x="140"
+        y="165"
+        font-size="21"
     >
         Audit Ratio
     </text>
@@ -271,6 +236,15 @@ function drawAuditorActivity(audits) {
 
     const svg = document.getElementById("auditor-activity");
 
+    const rowHeight = 40;
+    const margin = 30;
+    const contentHeight = margin * 2 + audits.length * rowHeight;
+
+    // Equal top/bottom margins so the row block sits exactly centered,
+    // regardless of how many audits there are or the card's rendered size.
+    svg.setAttribute("viewBox", `0 0 700 ${contentHeight}`);
+    svg.setAttribute("height", contentHeight);
+
     let items = "";
 
     audits.forEach((audit, index) => {
@@ -278,27 +252,27 @@ function drawAuditorActivity(audits) {
         const projectName = audit.group.path.split("/").pop();
         const auditCode = audit.private.code;
 
-        const y = 30 + index * 35;
+        const y = margin + index * rowHeight + 26;
 
         items += `
             <text
                 x="20"
                 y="${y}"
-                font-size="16"
+                font-size="19"
                 font-weight="bold"
             >
                 ${projectName}
             </text>
 
             <text
-                x="250"
+                x="260"
                 y="${y}"
-                font-size="14"
+                font-size="17"
             >
                 Audit Code: ${auditCode}
             </text>
 
-            <g class="copy-btn" data-code="${auditCode}" transform="translate(430, ${y - 15})">
+            <g class="copy-btn" data-code="${auditCode}" transform="translate(470, ${y - 17})">
                 <rect class="copy-hit" x="-6" y="-6" width="30" height="30" fill="transparent"/>
                 <g class="icon-copy">
                     <rect x="4" y="2" width="12" height="14" rx="2" ry="2"/>

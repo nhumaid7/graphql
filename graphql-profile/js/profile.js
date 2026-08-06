@@ -19,6 +19,25 @@ async function loadProfile() {
                 }
             }
 
+            allTransactions: transactions(
+                where: {
+                    type: { _eq: "xp" }
+                    object: {
+                        type: { _eq: "project" }
+                    }
+                }
+                order_by: { createdAt: asc }
+            ) {
+                amount
+                path
+                createdAt
+
+                object {
+                    name
+                    type
+                }
+            }
+
             recentTransactions: transactions(
                 where: {
                     type: { _eq: "xp" }
@@ -27,7 +46,7 @@ async function loadProfile() {
                     }
                 }
                 order_by: { createdAt: desc }
-                limit: 20
+                limit: 6
             ) {
                 amount
                 path
@@ -42,7 +61,7 @@ async function loadProfile() {
             audits(
                 where: { grade: { _is_null: true } }
                 order_by: { createdAt: desc }
-                limit: 5
+                limit: 6
             ) {
                 createdAt
 
@@ -65,13 +84,12 @@ async function loadProfile() {
     }
 
     const user = data.user[0];
-const xpProgress = [...user.recentTransactions].reverse();
     document.getElementById("welcome-message").innerText =
         `Welcome, ${user.firstName}`;
 
     document.getElementById("campus").textContent = user.campus;
 
-    drawXPGraph(xpProgress);
+    drawXPGraph(user.allTransactions);
     drawRecentXPGraph(user.recentTransactions);
     drawAuditGraph(user);
     drawAuditorActivity(user.audits);
